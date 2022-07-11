@@ -1,16 +1,22 @@
 {
   "name": "nodescrapy",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Web crawler in NodeJS",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest --collect-coverage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "scrapy",
+    "web-crawling",
+    "web-scraping",
+    "nodejs",
+    "typescript"
+  ],
+  "author": "Juan Roldan <juan.roldan.brz@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.4",
     "@typescript-eslint/eslint-plugin": "^5.30.4",
