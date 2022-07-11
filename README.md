@@ -25,10 +25,6 @@ const onItemCrawledFunction = (response: HtmlResponse) => {
 const crawler = new WebCrawler({
     dataPath: './crawled-items',
     entryUrls: ['https://www.pararius.com/apartments/amsterdam'],
-    discovery: {
-        allowedDomains: ['www.pararius.com'],
-        allowedPath: ['amsterdam/'],
-    },
     onItemCrawled: onItemCrawledFunction
 });
 
