@@ -41,7 +41,7 @@ crawler.crawl()
 * Provides basic statistics on crawling status.
 * Automatically parses the DOM of the HTMLs with [Cheerio](https://cheerio.js.org/)
 * Implementations can be easily extended.
-* Fully writen in Typescript.
+* Fully written in Typescript.
 
 ## Documentation
 
