@@ -1,5 +1,7 @@
 <img src="./logo.png" width="400" height="250" />
 
+![master](https://github.com/juanroldanbrz/nodescrapy/actions/workflows/ci.yml/badge.svg)
+
 [![Coverage Status](https://coveralls.io/repos/github/juanroldanbrz/nodescrapy/badge.svg?branch=master)](https://coveralls.io/github/juanroldanbrz/nodescrapy?branch=master)
 ## Overview 
 
