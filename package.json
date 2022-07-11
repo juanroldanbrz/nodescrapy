@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest --collect-coverage"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,7 @@
     "@typescript-eslint/eslint-plugin": "^5.30.4",
     "@typescript-eslint/parser": "^5.30.4",
     "axios-mock-adapter": "^1.21.1",
+    "coveralls": "^3.1.1",
     "eslint": "^8.19.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",

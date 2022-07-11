@@ -1,20 +1,28 @@
-name: CI
+on: ["push", "pull_request"]
 
-on: [ push ]
+name: Test Coveralls
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - uses: actions/checkout@v1
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
         with:
-          node-version: '14'
-      - name: NPM Install
+          node-version: 10.x
+
+      - name: npm install
         run: npm install
 
-      - name: NPM build
-        run: npm run build
+      - name: npm build and tests
+        run: |
+          npm build
+          npm test
 
-      - name: NPM Test
-        run: npm test
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
