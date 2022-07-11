@@ -1,6 +1,7 @@
 <img src="./logo.png" width="400" height="250" />
 
-## Overview
+[![Coverage Status](https://coveralls.io/repos/github/juanroldanbrz/nodescrapy/badge.svg?branch=master)](https://coveralls.io/github/juanroldanbrz/nodescrapy?branch=master)
+## Overview 
 
 Nodescrapy is a fast high-level and highly configurable web crawling and web scraping framework, used to
 crawl websites and extract structured data from their pages.
