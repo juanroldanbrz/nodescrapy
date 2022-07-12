@@ -1,14 +1,13 @@
-import {DefaultHttpClient, HttpClient} from './client/HttpClient';
 import LinkDiscovery from './discovery/LinkDiscovery';
-import {LinkStore} from './store/LinkStore';
-import {CrawlContinuationMode, CrawlerConfig} from './model/CrawlerConfig';
+import { LinkStore } from './store/LinkStore';
+import { CrawlContinuationMode, CrawlerConfig } from './model/CrawlerConfig';
 
-import {DataStore} from './store/DataStore';
+import { DataStore } from './store/DataStore';
 import WebCrawlerBuilder from './WebCrawlerBuilder';
-import {Link, LinkStatus} from './model/Link';
+import { Link, LinkStatus } from './model/Link';
 import logger from './log/Logger';
-import {DataEntry} from '../index';
-import HtmlResponse from './model/HtmlResponse';
+import { DataEntry, HttpClient } from '../index';
+import { HtmlResponse, HtmlResponseWrapper } from './model/HtmlResponse';
 
 class WebCrawler {
   private httpClient: HttpClient;
@@ -29,8 +28,10 @@ class WebCrawler {
 
   private readonly dataStore: DataStore;
 
+  private readonly concurrentRequests: number;
+
   constructor(config: CrawlerConfig) {
-    this.httpClient = new DefaultHttpClient(config.client);
+    this.httpClient = WebCrawlerBuilder.createHttpClient(config.client);
     this.name = config.name ?? 'nodescrapy';
     this.linkExtractor = WebCrawlerBuilder.createLinkExtractor(config);
     this.entryUrls = new Set<string>(config.entryUrls);
@@ -41,6 +42,7 @@ class WebCrawler {
     this.linkStorePromise = WebCrawlerBuilder.createLinkStore(config);
     this.dataStore = WebCrawlerBuilder.createDataStore(config);
     this.mode = config?.mode ?? CrawlContinuationMode.START_FROM_SCRATCH;
+    this.concurrentRequests = config?.client?.concurrentRequests ?? 1;
   }
 
   public async crawl(): Promise<void> {
@@ -63,11 +65,16 @@ class WebCrawler {
     const crawlingLog = setInterval(this.logCrawlingStatus.bind(this), 60 * 1000);
 
     do {
-      linksToCrawl = await this.linkStore.findByProviderAndStatus(this.name, LinkStatus.UNPROCESSED, 10);
-      for (const link of linksToCrawl) {
-        let response: HtmlResponse;
-        try {
-          response = await this.httpClient.get(link.url);
+      const querySize = this.concurrentRequests < 10 ? 10 : this.concurrentRequests;
+      linksToCrawl = await this.linkStore.findByProviderAndStatus(this.name, LinkStatus.UNPROCESSED, querySize);
+      const urlsToCrawl = new Map<string, number>();
+      linksToCrawl.forEach((link) => urlsToCrawl.set(link.url, link.id));
+      const responses = await this.performRequestsInBatch(Array.from(urlsToCrawl.keys()));
+      for (const responseWrapper of responses) {
+        if (!responseWrapper.isSuccess) {
+          await this.linkStore.changeStatus(urlsToCrawl.get(responseWrapper.url), LinkStatus.FAILED);
+        } else {
+          const { response } = responseWrapper;
           const newUrls = this.linkExtractor.extractLinks(response);
           for (const newUrl of newUrls) {
             await this.addUnprocessedLinkIfNew(newUrl);
@@ -76,10 +83,7 @@ class WebCrawler {
           if (extractedData !== undefined) {
             this.storeData(response, extractedData);
           }
-          await this.linkStore.changeStatus(link.id, LinkStatus.PROCESSED);
-        } catch (e) {
-          logger.error(`Failed to crawl: ${link.url} - ${e}`);
-          await this.linkStore.changeStatus(link.id, LinkStatus.FAILED);
+          await this.linkStore.changeStatus(urlsToCrawl.get(response.url), LinkStatus.PROCESSED);
         }
       }
     } while (linksToCrawl.length > 0);
@@ -101,6 +105,26 @@ class WebCrawler {
       url: urlToStore,
       status: LinkStatus.UNPROCESSED,
     });
+  }
+
+  private async performRequestsInBatch(urls: string[]): Promise<HtmlResponseWrapper[]> {
+    const responses = [];
+    let urlsToRequest = [];
+
+    for (let i = 0; i < urls.length; i += 1) {
+      urlsToRequest.push(urls[i]);
+      if (urlsToRequest.length === this.concurrentRequests) {
+        const results = await this.httpClient.get(urlsToRequest);
+        results.forEach((result) => responses.push(result));
+        urlsToRequest = [];
+      }
+    }
+
+    if (urlsToRequest.length !== 0) {
+      const results = await this.httpClient.get(urlsToRequest);
+      results.forEach((result) => responses.push(result));
+    }
+    return responses;
   }
 
   private storeData(response: HtmlResponse, extractedData: { [key: string]: any; }): void {

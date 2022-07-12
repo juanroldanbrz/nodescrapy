@@ -1,6 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
-import { DefaultHttpClient, LinkDiscovery, LinkDiscoveryConfig } from '../index';
-import HtmlResponse from '../lib/model/HtmlResponse';
+import {
+  HtmlResponse, HttpClient, LinkDiscovery, LinkDiscoveryConfig,
+} from '../index';
 
 const HTML = `
 <!DOCTYPE html>
@@ -18,6 +19,16 @@ const HTML = `
 </html>
 `;
 
+const defaultHttpConfig = {
+  retries: 2,
+  userAgent: 'Firefox',
+  retryDelay: 0.2,
+  delayBetweenRequests: 1,
+  timeoutSeconds: 100,
+  concurrentRequests: 1,
+  beforeRequest: undefined,
+};
+
 describe('LinkDiscovery', () => {
   const linkDiscoveryConfig: LinkDiscoveryConfig = {
     allowedDomains: ['www.mydomain.com'],
@@ -26,14 +37,14 @@ describe('LinkDiscovery', () => {
     onLinksDiscovered: undefined,
   };
 
-  const client = new DefaultHttpClient({});
-  const axiosInternalClient = client.client;
+  const client = new HttpClient(defaultHttpConfig);
+  const axiosInternalClient = client.clients[0];
   const mockClient = new MockAdapter(axiosInternalClient);
   mockClient.onGet().reply(200, HTML);
 
   it('Should extract the links', async () => {
-    const response = await client.get('https://www.mydomain.com');
-    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(response);
+    const responseWrapper = await client.get(['https://www.mydomain.com']);
+    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(responseWrapper[0].response);
 
     expect(result.size).toBe(3);
 
@@ -43,22 +54,22 @@ describe('LinkDiscovery', () => {
   });
 
   it('Should keep the query parameters', async () => {
-    const response = await client.get('https://www.mydomain.com');
+    const responseWrapper = await client.get(['https://www.mydomain.com']);
     linkDiscoveryConfig.removeQueryParams = false;
-    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(response);
+    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(responseWrapper[0].response);
 
     expect(result.size).toBe(3);
     expect(result.has('https://www.mydomain.com/valid/url2?1234')).toBeTruthy();
   });
 
   it('Should run the onLinkDiscovered method', async () => {
-    const response = await client.get('https://www.mydomain.com');
+    const responseWrapper = await client.get(['https://www.mydomain.com']);
     linkDiscoveryConfig.removeQueryParams = false;
     linkDiscoveryConfig.onLinksDiscovered = (htmlResponse: HtmlResponse, links: string[]) => {
       links.push('https://mycustomurl.com');
       return links;
     };
-    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(response);
+    const result = new LinkDiscovery(linkDiscoveryConfig).extractLinks(responseWrapper[0].response);
 
     expect(result.size).toBe(4);
     expect(result.has('https://mycustomurl.com')).toBeTruthy();

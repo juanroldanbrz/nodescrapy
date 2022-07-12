@@ -7,4 +7,13 @@ interface HtmlResponse {
   $: CheerioAPI;
 }
 
-export default HtmlResponse;
+interface HtmlResponseWrapper {
+  url: string,
+  response: HtmlResponse,
+  isSuccess: boolean
+}
+
+export {
+  HtmlResponseWrapper,
+  HtmlResponse,
+};
