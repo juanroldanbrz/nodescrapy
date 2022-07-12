@@ -16,7 +16,7 @@ interface LinkStore {
 }
 
 class DbLinkStore implements LinkStore {
-  private linksTable: ModelStatic<Model>;
+  readonly linksTable: ModelStatic<Model>;
 
   constructor(sequelize: Sequelize) {
     this.linksTable = sequelize.define('Links', {

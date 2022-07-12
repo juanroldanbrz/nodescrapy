@@ -1,5 +1,6 @@
+import appRoot from 'app-root-path';
 import {
-  DataStore, WebCrawlerBuilder, HttpRequest, DataEntry, FileDataStore,
+  DataStore, WebCrawlerBuilder, HttpRequest, DataEntry, FileDataStore, DbLinkStore, LinkStore, Link, LinkStatus,
 } from '../index';
 
 describe('WebCrawlerBuilder', () => {
@@ -124,5 +125,61 @@ describe('WebCrawlerBuilder', () => {
     });
 
     expect(createDataStore).toThrow();
+  });
+
+  it('Should create linkStore with the default configuration', async () => {
+    const linkStore = await WebCrawlerBuilder.createLinkStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+    }) as DbLinkStore;
+
+    expect(linkStore.linksTable.sequelize.config.database).toContain('nodescrapy/cache.sqlite');
+    expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Should create linkStore with the sqlite path', async () => {
+    const linkStore = await WebCrawlerBuilder.createLinkStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+      sqlitePath: `${appRoot}/tests/tmp/data.sqlite`,
+    }) as DbLinkStore;
+
+    expect(linkStore.linksTable.sequelize.config.database).toContain('tmp/data.sqlite');
+    expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Should create linkStore with the given implementation', async () => {
+    class LinkStoreImpl implements LinkStore {
+      addIfNew(link: Link): Promise<Link> {
+        return Promise.resolve(undefined);
+      }
+
+      changeStatus(id: number, status: LinkStatus) {
+      }
+
+      countByProviderAndStatus(provider: string, status: LinkStatus): Promise<number> {
+        return Promise.resolve(0);
+      }
+
+      deleteAll(provider: string): Promise<number> {
+        return Promise.resolve(0);
+      }
+
+      findByProviderAndStatus(provider: string, status: LinkStatus, n: number): Promise<Array<Link>> {
+        return Promise.resolve(undefined);
+      }
+    }
+
+    const linkStoreImpl = new LinkStoreImpl();
+
+    const linkStore = await WebCrawlerBuilder.createLinkStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+      implementation: {
+        linkStore: linkStoreImpl,
+      },
+    });
+
+    expect(linkStore).toBe(linkStoreImpl);
   });
 });
