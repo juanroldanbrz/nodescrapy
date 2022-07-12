@@ -7,7 +7,7 @@
 Nodescrapy is a fast high-level and highly configurable web crawling and web scraping framework, used to
 crawl websites and extract structured data from their pages.
 
-Nodescrapy is writen in [Typescript](https://www.typescriptlang.org/) and works in a [NodeJs](http://nodejs.org) environment.
+Nodescrapy is written in [Typescript](https://www.typescriptlang.org/) and works in a [NodeJs](http://nodejs.org) environment.
 
 Nodescrapy comes with a built-in web spider, which will discover automatically all the URLs of the website.
 
