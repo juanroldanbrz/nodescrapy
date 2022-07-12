@@ -360,6 +360,14 @@ Configures where to store the sqlite database (full path, including name)
 <a name="CrawlerClientConfig"></a>
 ### Client configuration
 
+<a name="CrawlerClientConfig+concurrentRequests"></a>
+#### client.concurrentRequests :  <code>number</code>
+
+Configures the number of concurrent requests.
+**Default**: `1`
+<br></br>
+
+
 <a name="CrawlerClientConfig+retries"></a>
 #### client.retries :  <code>number</code>
 
@@ -466,7 +474,6 @@ Function that can be used to remove / add links to crawl. **Default**: `undefine
 Features to be implemented:
 
 - Store status and data in MongoDB.
-- Allow concurrent requests.
 - Create more examples.
 - Add mode to retry errors.
 - Increase unit tests coverage.
