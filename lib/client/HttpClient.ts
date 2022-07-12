@@ -36,11 +36,14 @@ const configureAxios = (
 class HttpClient {
   readonly userAgent: string;
 
+  readonly originalConfig: HttpClientConfig;
+
   readonly clients: AxiosInstance[];
 
   readonly beforeRequestImpl?: (httpRequest: any) => any;
 
   constructor(config: HttpClientConfig) {
+    this.originalConfig = config;
     this.clients = [];
     for (let i = 0; i < config.concurrentRequests; i += 1) {
       const client = axios.create({
