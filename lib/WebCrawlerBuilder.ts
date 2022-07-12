@@ -1,11 +1,15 @@
 import * as url from 'url';
-import {Sequelize} from 'sequelize';
-import {CrawlerConfig} from './model/CrawlerConfig';
-import {DbLinkStore, LinkStore} from './store/LinkStore';
+import { Sequelize } from 'sequelize';
+import { CrawlerConfig, HttpClientConfig } from './model/CrawlerConfig';
+import { DbLinkStore, LinkStore } from './store/LinkStore';
 import LinkDiscovery from './discovery/LinkDiscovery';
-import {DataStore, FileDataStore} from './store/DataStore';
+import { DataStore, FileDataStore } from './store/DataStore';
+import HttpClient from './client/HttpClient';
 
 const appRoot = require('app-root-path');
+
+const defaultUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+    + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36';
 
 class WebCrawlerBuilder {
   public static async createLinkStore(config: CrawlerConfig): Promise<LinkStore> {
@@ -32,6 +36,18 @@ class WebCrawlerBuilder {
     const dataPath = config?.dataPath;
     const dataBatchSize = config?.dataBatchSize ?? 50;
     return new FileDataStore(dataPath, dataBatchSize);
+  }
+
+  public static createHttpClient(config: HttpClientConfig): HttpClient {
+    return new HttpClient({
+      retries: config?.retries ?? 2,
+      userAgent: config?.userAgent ?? defaultUserAgent,
+      retryDelay: config?.retryDelay ?? 5,
+      delayBetweenRequests: config?.delayBetweenRequests ?? 2,
+      timeoutSeconds: config?.timeoutSeconds ?? 10,
+      concurrentRequests: config?.concurrentRequests ?? 1,
+      beforeRequest: config?.beforeRequest,
+    });
   }
 
   public static createLinkExtractor(config: CrawlerConfig): LinkDiscovery {

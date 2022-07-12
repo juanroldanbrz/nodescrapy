@@ -1,15 +1,16 @@
-import HtmlResponse from './HtmlResponse';
 import HttpRequest from './HttpRequest';
 import { DataStore } from '../store/DataStore';
 import { LinkStore } from '../store/LinkStore';
+import { HtmlResponse } from './HtmlResponse';
 
 interface HttpClientConfig {
     retries?: number,
     userAgent?: string,
-    delayBetweenRetries?: number,
+    retryDelay?: number,
     delayBetweenRequests?: number,
     timeoutSeconds?: number,
-    onRequestPrepared?: (htmlRequest: HttpRequest) => HttpRequest;
+    concurrentRequests? : number,
+    beforeRequest?: (htmlRequest: HttpRequest) => HttpRequest;
 }
 
 interface LinkDiscoveryConfig {

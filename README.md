@@ -231,10 +231,10 @@ This is a definition of all the possible configuration supported currently by th
     client: {
         retries: 5,
         userAgent: 'Firefox',
-        delayBetweenRetries: 2,
+        retryDelay: 2,
         delayBetweenRequests: 2,
         timeoutSeconds: 100,
-        onRequestPrepared: (htmlRequest: HttpRequest) => {
+        beforeRequest: (htmlRequest: HttpRequest) => {
             htmlRequest.headers.Authorization = 'JWT MyAuth';
             return htmlRequest;
         }
@@ -375,8 +375,8 @@ Configures the user agents of the client.
 **Default**: `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36`
 <br></br>
 
-<a name="CrawlerClientConfig+delayBetweenRetries"></a>
-#### client.delayBetweenRetries :  <code>number</code>
+<a name="CrawlerClientConfig+retryDelay"></a>
+#### client.retryDelay :  <code>number</code>
 
 Configures how many seconds the client will wait between different requests.
 **Default**: `5`
@@ -388,8 +388,8 @@ Configures how many seconds the client will wait between different requests.
 Configures the timeout of the client, in seconds. **Default**: `10`
 <br></br>
 
-<a name="CrawlerClientConfig+onRequestPrepared"></a>
-#### client.onRequestPrepared :  <code>(htmlRequest: HttpRequest) => HttpRequest</code>
+<a name="CrawlerClientConfig+beforeRequest"></a>
+#### client.beforeRequest :  <code>(htmlRequest: HttpRequest) => HttpRequest</code>
 
 Function which allows to modify the url or the headers before performing the request.
 Useful to add authentication headers or change the URL for a proxy one.
@@ -399,7 +399,7 @@ Useful to add authentication headers or change the URL for a proxy one.
 ###### Example
 ```ts
     {
-        client.onRequestPrepared: (request: HttpRequest): HttpRequest => {
+        client.beforeRequest: (request: HttpRequest): HttpRequest => {
             const proxyUrl = `http://www.myproxy.com?url=${request.url}`;
     
             const requestHeaders = request.headers;

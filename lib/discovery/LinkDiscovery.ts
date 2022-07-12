@@ -1,5 +1,5 @@
 import * as url from 'url';
-import HtmlResponse from '../model/HtmlResponse';
+import { HtmlResponse } from '../model/HtmlResponse';
 import { LinkDiscoveryConfig } from '../model/CrawlerConfig';
 
 class LinkDiscovery {
