@@ -34,4 +34,40 @@ describe('WebCrawlerBuilder', () => {
     expect(client.originalConfig.retryDelay).toBe(0.2);
     expect(client.originalConfig.beforeRequest).toBeDefined();
   });
+
+  it('Should create the link discovery with default configuration', async () => {
+    const linkDiscovery = WebCrawlerBuilder.createLinkDiscovery({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+    });
+
+    expect(linkDiscovery.allowedDomains.size).toBe(2);
+    expect(linkDiscovery.allowedDomains.has('www.mydomain.com')).toBeTruthy();
+    expect(linkDiscovery.allowedDomains.has('myotherdomain.com')).toBeTruthy();
+    expect(linkDiscovery.allowedPath.size).toBe(1);
+    expect(linkDiscovery.allowedPath.has('.*')).toBeTruthy();
+    expect(linkDiscovery.removeQueryParams).toBeTruthy();
+    expect(linkDiscovery.onLinksDiscovered).toBeUndefined();
+  });
+
+  it('Should create the link discovery overriding the default configuration', async () => {
+    const linkDiscovery = WebCrawlerBuilder.createLinkDiscovery({
+      discovery: {
+        allowedPath: ['amsterdam', 'for-rent'],
+        allowedDomains: ['www.test.com'],
+        removeQueryParams: false,
+        onLinksDiscovered: (response, links) => links,
+      },
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+    });
+
+    expect(linkDiscovery.allowedDomains.size).toBe(1);
+    expect(linkDiscovery.allowedDomains.has('www.test.com')).toBeTruthy();
+    expect(linkDiscovery.allowedPath.size).toBe(2);
+    expect(linkDiscovery.allowedPath.has('amsterdam')).toBeTruthy();
+    expect(linkDiscovery.allowedPath.has('for-rent')).toBeTruthy();
+    expect(linkDiscovery.removeQueryParams).toBeFalsy();
+    expect(linkDiscovery.onLinksDiscovered).toBeDefined();
+  });
 });

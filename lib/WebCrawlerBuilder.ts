@@ -50,7 +50,7 @@ class WebCrawlerBuilder {
     });
   }
 
-  public static createLinkExtractor(config: CrawlerConfig): LinkDiscovery {
+  public static createLinkDiscovery(config: CrawlerConfig): LinkDiscovery {
     return new LinkDiscovery({
       allowedDomains: config?.discovery?.allowedDomains ?? WebCrawlerBuilder.mapUrlToDomains(config.entryUrls),
       allowedPath: config?.discovery?.allowedPath ?? ['.*'],

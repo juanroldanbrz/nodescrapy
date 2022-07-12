@@ -3,17 +3,17 @@ import { HtmlResponse } from '../model/HtmlResponse';
 import { LinkDiscoveryConfig } from '../model/CrawlerConfig';
 
 class LinkDiscovery {
-  private allowedDomains: Set<string>;
+  readonly allowedDomains: Set<string>;
 
-  private readonly allowedPath: string[];
+  readonly allowedPath: Set<string>;
 
-  private readonly removeQueryParams: boolean;
+  readonly removeQueryParams: boolean;
 
-  private readonly onLinksDiscovered: (response: HtmlResponse, links: string[]) => string[] | undefined;
+  readonly onLinksDiscovered: (response: HtmlResponse, links: string[]) => string[] | undefined;
 
   constructor(config: LinkDiscoveryConfig) {
     this.allowedDomains = new Set<string>(config.allowedDomains);
-    this.allowedPath = config.allowedPath;
+    this.allowedPath = new Set<string>(config.allowedPath);
     this.removeQueryParams = config.removeQueryParams;
     this.onLinksDiscovered = config.onLinksDiscovered;
   }
@@ -47,7 +47,7 @@ class LinkDiscovery {
   }
 
   private filterRegex(links: Set<string>): Set<string> {
-    const toReturn = Array.from(links).filter((aUrl) => this.allowedPath.some(
+    const toReturn = Array.from(links).filter((aUrl) => Array.from(this.allowedPath).some(
       (regex) => aUrl.match(regex) || aUrl.includes(regex),
     ));
     return new Set<string>(toReturn);

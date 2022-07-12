@@ -33,7 +33,7 @@ class WebCrawler {
   constructor(config: CrawlerConfig) {
     this.httpClient = WebCrawlerBuilder.createHttpClient(config.client);
     this.name = config.name ?? 'nodescrapy';
-    this.linkExtractor = WebCrawlerBuilder.createLinkExtractor(config);
+    this.linkExtractor = WebCrawlerBuilder.createLinkDiscovery(config);
     this.entryUrls = new Set<string>(config.entryUrls);
     if (config?.onItemCrawled === undefined) {
       throw new Error('onItemCrawled should be defined.');
