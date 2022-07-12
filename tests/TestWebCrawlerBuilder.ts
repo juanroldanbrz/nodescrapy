@@ -1,5 +1,6 @@
-import { WebCrawlerBuilder } from '../index';
-import HttpRequest from '../lib/model/HttpRequest';
+import {
+  DataStore, WebCrawlerBuilder, HttpRequest, DataEntry, FileDataStore,
+} from '../index';
 
 describe('WebCrawlerBuilder', () => {
   it('Should create the http client with default configuration', async () => {
@@ -69,5 +70,59 @@ describe('WebCrawlerBuilder', () => {
     expect(linkDiscovery.allowedPath.has('for-rent')).toBeTruthy();
     expect(linkDiscovery.removeQueryParams).toBeFalsy();
     expect(linkDiscovery.onLinksDiscovered).toBeDefined();
+  });
+
+  it('Should create the data store with the override implementation', async () => {
+    class DataStoreImpl implements DataStore {
+      addData(dataEntry: DataEntry) {
+      }
+
+      afterCrawl() {
+      }
+
+      beforeCrawl() {
+      }
+    }
+    const dataStoreImpl = new DataStoreImpl();
+
+    const dataStore = WebCrawlerBuilder.createDataStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+      implementation: {
+        dataStore: dataStoreImpl,
+      },
+    });
+
+    expect(dataStore).toBe(dataStoreImpl);
+  });
+
+  it('Should create the data store with the default implementation', async () => {
+    let dataStore = WebCrawlerBuilder.createDataStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+      dataPath: './output-data',
+    }) as FileDataStore;
+
+    expect(dataStore.dataPath).toBe('./output-data');
+    expect(dataStore.dataBatchSize).toBe(50);
+
+    dataStore = WebCrawlerBuilder.createDataStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+      dataPath: './output-data',
+      dataBatchSize: 10,
+    }) as FileDataStore;
+
+    expect(dataStore.dataPath).toBe('./output-data');
+    expect(dataStore.dataBatchSize).toBe(10);
+  });
+
+  it('Should fail create the data store if not data path', async () => {
+    const createDataStore = () => WebCrawlerBuilder.createDataStore({
+      entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
+      onItemCrawled: (response) => undefined,
+    });
+
+    expect(createDataStore).toThrow();
   });
 });

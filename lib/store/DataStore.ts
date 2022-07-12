@@ -14,9 +14,9 @@ interface DataStore {
 class FileDataStore implements DataStore {
   private tmpData: Array<DataEntry> = [];
 
-  private readonly dataPath: string;
+  readonly dataPath: string;
 
-  private readonly dataBatchSize: number;
+  readonly dataBatchSize: number;
 
   constructor(dataPath: string, dataBatchSize: number) {
     this.dataPath = dataPath;
