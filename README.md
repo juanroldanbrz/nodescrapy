@@ -75,7 +75,14 @@ A simple configuration contains:
 import {HtmlResponse, WebCrawler} from 'nodescrapy';
 
 const onItemCrawledFunction = (response: HtmlResponse) => {
-    return { "data1": "test" }
+    if (!response.url.includes('-for-rent')) {
+        return undefined;
+    }
+
+    const $ = response.$;
+    return {
+        'title': $('.listing-detail-summary__title , #onetrust-accept-btn-handler').text(),
+    }
 }
 
 const crawler = new WebCrawler({
