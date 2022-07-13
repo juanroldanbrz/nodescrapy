@@ -73,8 +73,7 @@ A simple configuration contains:
 * What to do when a new page is crawled (function [onItemCrawled](#CrawlerConfiguration+onItemCrawled))
 
 ```js
-import {HtmlResponse, WebCrawler} 
-@bluggie/nodescrapy';
+import {HtmlResponse, WebCrawler} from '@bluggie/nodescrapy';
 
 const onItemCrawledFunction = (response: HtmlResponse) => {
     if (!response.url.includes('-for-rent')) {
