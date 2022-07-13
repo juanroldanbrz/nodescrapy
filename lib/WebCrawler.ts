@@ -10,7 +10,7 @@ import { DataEntry, HttpClient } from '../index';
 import { HtmlResponse, HtmlResponseWrapper } from './model/HtmlResponse';
 
 class WebCrawler {
-  private httpClient: HttpClient;
+  httpClient: HttpClient;
 
   private readonly name: string;
 
@@ -22,7 +22,7 @@ class WebCrawler {
 
   private readonly onItemCrawled: (response: HtmlResponse) => { [key: string]: any; } | undefined;
 
-  private linkStore: LinkStore;
+  linkStore: LinkStore;
 
   private readonly linkStorePromise: Promise<LinkStore>;
 
