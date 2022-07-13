@@ -236,6 +236,7 @@ This is a definition of all the possible configuration supported currently by th
     mode: 'START_FROM_SCRATCH',
     entryUrls: ['http://www.pararius.com'],
     client: {
+        concurrentRequests: 5,
         retries: 5,
         userAgent: 'Firefox',
         retryDelay: 2,
