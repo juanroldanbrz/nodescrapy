@@ -16,7 +16,7 @@ Nodescrapy saves the status of the crawling in a local Sqlite database, so crawl
 By default, Nodescrapy saves the results of the scrapping in a local folder in JSON files.
 
 ```ts
-import {HtmlResponse, WebCrawler} from 'nodescrapy';
+import {HtmlResponse, WebCrawler} from '@bluggie/nodescrapy';
 
 const onItemCrawledFunction = (response: HtmlResponse) => {
     return { "data1": ... }
@@ -57,7 +57,7 @@ crawler.crawl()
 ## Installation
 
 ```sh
-npm install --save nodescrapy
+npm install --save @bluggie/nodescrapy
 ```
 
 ## Getting Started
@@ -72,7 +72,8 @@ A simple configuration contains:
 * What to do when a new page is crawled (function [onItemCrawled](#CrawlerConfiguration+onItemCrawled))
 
 ```js
-import {HtmlResponse, WebCrawler} from 'nodescrapy';
+import {HtmlResponse, WebCrawler} 
+@bluggie/nodescrapy';
 
 const onItemCrawledFunction = (response: HtmlResponse) => {
     if (!response.url.includes('-for-rent')) {

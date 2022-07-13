@@ -1,12 +1,19 @@
 {
-  "name": "nodescrapy",
-  "version": "0.1.0",
+  "name": "@bluggie/nodescrapy",
+  "version": "0.1.2",
   "description": "Web crawler in NodeJS",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest --collect-coverage"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juanroldanbrz/nodescrapy.git"
   },
   "keywords": [
     "scrapy",
