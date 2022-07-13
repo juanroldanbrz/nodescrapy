@@ -50,6 +50,7 @@ crawler.crawl()
 - [Crawling modes](#crawling-modes)
 - [Data Models](#data-models)
 - [Configuration](#crawler-configuration)
+- [Examples](#examples)
 - [Roadmap](#roadmap)
 - [Contributors](#contributors)
 - [License](#license)
@@ -478,6 +479,9 @@ Function that can be used to remove / add links to crawl. **Default**: `undefine
 }
 ```
 <br></br>
+## Examples
+
+You can check some examples in the examples folder.
 
 ## Roadmap
 Features to be implemented:
