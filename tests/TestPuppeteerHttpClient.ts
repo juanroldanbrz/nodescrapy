@@ -13,6 +13,7 @@ const defaultHttpConfig = {
 };
 
 describe('HttpClient', () => {
+  jest.setTimeout(100_000);
   it('Client should be initialized.', async () => {
     const client = await new PuppeteerHttpClient(defaultHttpConfig);
     await client.initialize();
@@ -22,8 +23,7 @@ describe('HttpClient', () => {
   it('Client should request a page.', async () => {
     const client = await new PuppeteerHttpClient(defaultHttpConfig);
     await client.initialize();
-    const response = await client.onGetRequest('https://stackoverflow.com/questions/52497252/'
-        + 'puppeteer-wait-until-page-is-completely-loaded', 0);
+    const response = await client.onGetRequest('https://www.amazon.es/gp/new-releases/computers/ref=zg_bsnr_pg_1?ie=UTF8&pg=1', 0);
     const i = 2;
   });
 });
