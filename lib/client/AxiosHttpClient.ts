@@ -80,7 +80,7 @@ class AxiosHttpClient implements HttpClient {
     }
     logger.info(`Crawling ${httpRequest.url}`);
     try {
-      const axiosResponse = await this.clients[requestPoolId].get(httpRequest.url, {
+      const originalResponse = await this.clients[requestPoolId].get(httpRequest.url, {
         headers: httpRequest.headers,
         'axios-retry': {
           onRetry: (retryCount, error) => {
@@ -88,13 +88,17 @@ class AxiosHttpClient implements HttpClient {
           },
         },
       });
-      const cheerioResponse = cheerio.load(axiosResponse.data);
-      const innerResponse: HtmlResponse = { url: httpRequest.url, axiosResponse, $: cheerioResponse };
+      const cheerioResponse = cheerio.load(originalResponse.data);
+      const innerResponse: HtmlResponse = { url: httpRequest.url, originalResponse, $: cheerioResponse };
       return { url: httpRequest.url, response: innerResponse, isSuccess: true };
     } catch (e) {
       logger.error(`Failed to crawl: ${httpRequest.url} - ${e}`);
       return { url: httpRequest.url, response: undefined, isSuccess: false };
     }
+  }
+
+  initialize(): Promise<void> {
+    return Promise.resolve(undefined);
   }
 }
 

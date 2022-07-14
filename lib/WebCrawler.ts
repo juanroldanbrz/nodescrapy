@@ -10,8 +10,6 @@ import { DataEntry, HttpClient } from '../index';
 import { HtmlResponse, HtmlResponseWrapper } from './model/HtmlResponse';
 
 class WebCrawler {
-  httpClient: HttpClient;
-
   private readonly name: string;
 
   private readonly mode: CrawlContinuationMode;
@@ -22,16 +20,20 @@ class WebCrawler {
 
   private readonly onItemCrawled: (response: HtmlResponse) => { [key: string]: any; } | undefined;
 
+  private readonly linkStorePromise: Promise<LinkStore>;
+
   linkStore: LinkStore;
 
-  private readonly linkStorePromise: Promise<LinkStore>;
+  private readonly httpClientPromise: Promise<HttpClient>;
+
+  httpClient: HttpClient;
 
   private readonly dataStore: DataStore;
 
   private readonly concurrentRequests: number;
 
   constructor(config: CrawlerConfig) {
-    this.httpClient = WebCrawlerBuilder.createHttpClient(config.client);
+    this.httpClientPromise = WebCrawlerBuilder.createHttpClient(config.client);
     this.name = config.name ?? 'nodescrapy';
     this.linkExtractor = WebCrawlerBuilder.createLinkDiscovery(config);
     this.entryUrls = new Set<string>(config.entryUrls);
@@ -48,6 +50,10 @@ class WebCrawler {
   public async crawl(): Promise<void> {
     if (this.linkStore === undefined) {
       this.linkStore = await this.linkStorePromise;
+    }
+
+    if (this.httpClient === undefined) {
+      this.httpClient = await this.httpClientPromise;
     }
     logger.info('Crawled started.');
 

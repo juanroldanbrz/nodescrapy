@@ -182,7 +182,7 @@ This information should be enough to extract the information you need from that 
 interface HtmlResponse {
   url: string;
 
-  axiosResponse: AxiosResponse;
+  originalResponse: AxiosResponse;
 
   $: CheerioAPI;
 }

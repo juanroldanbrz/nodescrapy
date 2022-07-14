@@ -1,9 +1,10 @@
 import { AxiosResponse } from 'axios';
 import { CheerioAPI } from 'cheerio';
+import puppeteer from 'puppeteer';
 
 interface HtmlResponse {
   url: string;
-  axiosResponse: AxiosResponse;
+  originalResponse: AxiosResponse | puppeteer.HTTPResponse;
   $: CheerioAPI;
 }
 

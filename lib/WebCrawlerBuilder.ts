@@ -6,6 +6,7 @@ import LinkDiscovery from './discovery/LinkDiscovery';
 import { DataStore, FileDataStore } from './store/DataStore';
 import HttpClient from './client/HttpClient';
 import AxiosHttpClient from './client/AxiosHttpClient';
+import PuppeteerHttpClient from "./client/PuppeteerHttpClient";
 
 const appRoot = require('app-root-path');
 
@@ -39,8 +40,8 @@ class WebCrawlerBuilder {
     return new FileDataStore(dataPath, dataBatchSize);
   }
 
-  public static createHttpClient(config: HttpClientConfig): HttpClient {
-    return new AxiosHttpClient({
+  public static async createHttpClient(config: HttpClientConfig): Promise<HttpClient> {
+    const client = new PuppeteerHttpClient({
       retries: config?.retries ?? 2,
       userAgent: config?.userAgent ?? defaultUserAgent,
       retryDelay: config?.retryDelay ?? 5,
@@ -49,6 +50,8 @@ class WebCrawlerBuilder {
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
     });
+    await client.initialize();
+    return client;
   }
 
   public static createLinkDiscovery(config: CrawlerConfig): LinkDiscovery {
