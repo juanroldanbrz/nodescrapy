@@ -5,6 +5,7 @@ import { DbLinkStore, LinkStore } from './store/LinkStore';
 import LinkDiscovery from './discovery/LinkDiscovery';
 import { DataStore, FileDataStore } from './store/DataStore';
 import HttpClient from './client/HttpClient';
+import AxiosHttpClient from './client/AxiosHttpClient';
 
 const appRoot = require('app-root-path');
 
@@ -39,7 +40,7 @@ class WebCrawlerBuilder {
   }
 
   public static createHttpClient(config: HttpClientConfig): HttpClient {
-    return new HttpClient({
+    return new AxiosHttpClient({
       retries: config?.retries ?? 2,
       userAgent: config?.userAgent ?? defaultUserAgent,
       retryDelay: config?.retryDelay ?? 5,

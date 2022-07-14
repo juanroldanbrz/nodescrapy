@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 import appRoot from 'app-root-path';
 import MockAdapter from 'axios-mock-adapter';
-import { DbLinkStore, HtmlResponse, WebCrawler } from '..';
+import {
+  AxiosHttpClient, DbLinkStore, HtmlResponse, WebCrawler,
+} from '..';
 
 const indexHtml = fs.readFileSync(`${appRoot}/tests/resources/index.html`).toString();
 const listing2Html = fs.readFileSync(`${appRoot}/tests/resources/amsterdam-listing-2.html`).toString();
@@ -42,7 +44,9 @@ describe('WebCrawler', () => {
       onItemCrawled: onItemCrawledFunction,
     });
 
-    for (const axiosInternalClient of crawler.httpClient.clients) {
+    const httpClient = crawler.httpClient as AxiosHttpClient;
+
+    for (const axiosInternalClient of httpClient.clients) {
       const mockClient = new MockAdapter(axiosInternalClient);
       mockClient.onGet('http://www.myhousing.com').replyOnce(200, indexHtml);
       mockClient.onGet('http://www.myhousing.com/housing-listing/amsterdam-2')

@@ -1,11 +1,20 @@
 import appRoot from 'app-root-path';
 import {
-  DataStore, WebCrawlerBuilder, HttpRequest, DataEntry, FileDataStore, DbLinkStore, LinkStore, Link, LinkStatus,
+  DataStore,
+  WebCrawlerBuilder,
+  HttpRequest,
+  DataEntry,
+  FileDataStore,
+  DbLinkStore,
+  LinkStore,
+  Link,
+  LinkStatus,
+  AxiosHttpClient,
 } from '../index';
 
 describe('WebCrawlerBuilder', () => {
   it('Should create the http client with default configuration', async () => {
-    const client = WebCrawlerBuilder.createHttpClient({});
+    const client = WebCrawlerBuilder.createHttpClient({}) as AxiosHttpClient;
     expect(client.originalConfig.concurrentRequests).toBe(1);
     expect(client.originalConfig.userAgent).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
             + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36');
@@ -27,7 +36,7 @@ describe('WebCrawlerBuilder', () => {
       beforeRequest: (httpRequest: HttpRequest) => httpRequest,
     };
 
-    const client = WebCrawlerBuilder.createHttpClient(config);
+    const client = WebCrawlerBuilder.createHttpClient(config) as AxiosHttpClient;
     expect(client.originalConfig.concurrentRequests).toBe(5);
     expect(client.originalConfig.userAgent).toBe('Firefox');
     expect(client.originalConfig.delayBetweenRequests).toBe(5);

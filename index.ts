@@ -1,3 +1,4 @@
+import AxiosHttpClient from './lib/client/AxiosHttpClient';
 import HttpRequest from './lib/model/HttpRequest';
 import { CrawlContinuationMode, CrawlerConfig, LinkDiscoveryConfig } from './lib/model/CrawlerConfig';
 import { HtmlResponse } from './lib/model/HtmlResponse';
@@ -11,6 +12,7 @@ import WebCrawler from './lib/WebCrawler';
 import HttpClient from './lib/client/HttpClient';
 
 export {
+  AxiosHttpClient,
   HttpClient,
   LinkStatus,
   WebCrawler,

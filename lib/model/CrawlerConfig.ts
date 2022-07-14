@@ -4,6 +4,7 @@ import { LinkStore } from '../store/LinkStore';
 import { HtmlResponse } from './HtmlResponse';
 
 interface HttpClientConfig {
+    onGetRequest?: (htmlRequest: HttpRequest) => HttpRequest
     retries?: number,
     userAgent?: string,
     retryDelay?: number,

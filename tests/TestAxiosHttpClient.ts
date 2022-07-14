@@ -1,6 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import HttpRequest from '../lib/model/HttpRequest';
-import HttpClient from '../lib/client/HttpClient';
+import { AxiosHttpClient, HttpRequest } from '..';
 
 const HTML = `
 <!DOCTYPE html>
@@ -27,7 +26,7 @@ const defaultHttpConfig = {
 
 describe('HttpClient', () => {
   it('Client should retry urls.', async () => {
-    const client = await new HttpClient(defaultHttpConfig);
+    const client = await new AxiosHttpClient(defaultHttpConfig);
     const axiosInternalClient = client.clients[0];
     const mockClient = new MockAdapter(axiosInternalClient);
     mockClient.onGet('https://mybadurl.com/').replyOnce(404);
@@ -53,7 +52,7 @@ describe('HttpClient', () => {
       beforeRequest: beforeRequestImpl,
     };
 
-    const client = new HttpClient(httpClientConfig);
+    const client = new AxiosHttpClient(httpClientConfig);
     const axiosInternalClient = client.clients[0];
     const mockClient = new MockAdapter(axiosInternalClient);
     mockClient.onGet('http://www.myproxy.com?url=https://mybadurl.com/').replyOnce(200, HTML);
@@ -66,7 +65,7 @@ describe('HttpClient', () => {
       ...defaultHttpConfig,
       concurrentRequests: 5,
     };
-    const client = await new HttpClient(httpClientConfig);
+    const client = await new AxiosHttpClient(httpClientConfig);
     for (const axiosClient of client.clients) {
       const mockClient = new MockAdapter(axiosClient, { delayResponse: 2000 });
       mockClient.onGet('https://mybadurl.com/').reply(200, HTML);
@@ -91,7 +90,7 @@ describe('HttpClient', () => {
       retries: 2,
       retryDelay: 0.5,
     };
-    const client = await new HttpClient(httpClientConfig);
+    const client = await new AxiosHttpClient(httpClientConfig);
     for (const axiosClient of client.clients) {
       const mockClient = new MockAdapter(axiosClient);
       mockClient.onGet('https://mybadurl.com/').reply(200, HTML);
