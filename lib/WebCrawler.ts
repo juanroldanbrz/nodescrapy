@@ -1,5 +1,5 @@
 import LinkDiscovery from './discovery/LinkDiscovery';
-import { LinkStore } from './store/LinkStore';
+import { DbLinkStore, LinkStore } from './store/LinkStore';
 import { CrawlContinuationMode, CrawlerConfig } from './model/CrawlerConfig';
 
 import { DataStore } from './store/DataStore';
@@ -20,20 +20,16 @@ class WebCrawler {
 
   private readonly onItemCrawled: (response: HtmlResponse) => { [key: string]: any; } | undefined;
 
-  private readonly linkStorePromise: Promise<LinkStore>;
+  readonly linkStore: LinkStore;
 
-  linkStore: LinkStore;
-
-  private readonly httpClientPromise: Promise<HttpClient>;
-
-  httpClient: HttpClient;
+  readonly httpClient: HttpClient;
 
   private readonly dataStore: DataStore;
 
   private readonly concurrentRequests: number;
 
   constructor(config: CrawlerConfig) {
-    this.httpClientPromise = WebCrawlerBuilder.createHttpClient(config.client);
+    this.httpClient = WebCrawlerBuilder.createHttpClient(config.client);
     this.name = config.name ?? 'nodescrapy';
     this.linkExtractor = WebCrawlerBuilder.createLinkDiscovery(config);
     this.entryUrls = new Set<string>(config.entryUrls);
@@ -41,20 +37,16 @@ class WebCrawler {
       throw new Error('onItemCrawled should be defined.');
     }
     this.onItemCrawled = config.onItemCrawled;
-    this.linkStorePromise = WebCrawlerBuilder.createLinkStore(config);
+    this.linkStore = WebCrawlerBuilder.createLinkStore(config);
     this.dataStore = WebCrawlerBuilder.createDataStore(config);
     this.mode = config?.mode ?? CrawlContinuationMode.START_FROM_SCRATCH;
     this.concurrentRequests = config?.client?.concurrentRequests ?? 1;
   }
 
   public async crawl(): Promise<void> {
-    if (this.linkStore === undefined) {
-      this.linkStore = await this.linkStorePromise;
-    }
+    await this.linkStore.initialize();
+    await this.httpClient.initialize();
 
-    if (this.httpClient === undefined) {
-      this.httpClient = await this.httpClientPromise;
-    }
     logger.info('Crawled started.');
 
     if (this.mode === CrawlContinuationMode.START_FROM_SCRATCH) {
@@ -97,6 +89,7 @@ class WebCrawler {
     this.dataStore.afterCrawl();
     clearInterval(crawlingLog);
     logger.info('Crawled finished.');
+    await this.httpClient.destroy();
   }
 
   private async logCrawlingStatus(): Promise<void> {

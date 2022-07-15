@@ -6,7 +6,7 @@ import LinkDiscovery from './discovery/LinkDiscovery';
 import { DataStore, FileDataStore } from './store/DataStore';
 import HttpClient from './client/HttpClient';
 import AxiosHttpClient from './client/AxiosHttpClient';
-import PuppeteerHttpClient from "./client/PuppeteerHttpClient";
+import PuppeteerHttpClient from './client/PuppeteerHttpClient';
 
 const appRoot = require('app-root-path');
 
@@ -14,7 +14,7 @@ const defaultUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
     + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36';
 
 class WebCrawlerBuilder {
-  public static async createLinkStore(config: CrawlerConfig): Promise<LinkStore> {
+  public static createLinkStore(config: CrawlerConfig): LinkStore {
     if (config?.implementation?.linkStore !== undefined) {
       return config.implementation.linkStore;
     }
@@ -23,9 +23,7 @@ class WebCrawlerBuilder {
     const sequelize = new Sequelize(`sqlite:////${sqliteDbPath}`, {
       logging: false,
     });
-    const dbLinkStore = new DbLinkStore(sequelize);
-    await dbLinkStore.sync();
-    return dbLinkStore;
+    return new DbLinkStore(sequelize);
   }
 
   public static createDataStore(config: CrawlerConfig): DataStore {
@@ -40,8 +38,8 @@ class WebCrawlerBuilder {
     return new FileDataStore(dataPath, dataBatchSize);
   }
 
-  public static async createHttpClient(config: HttpClientConfig): Promise<HttpClient> {
-    const client = new PuppeteerHttpClient({
+  public static createHttpClient(config: HttpClientConfig): HttpClient {
+    return new PuppeteerHttpClient({
       retries: config?.retries ?? 2,
       userAgent: config?.userAgent ?? defaultUserAgent,
       retryDelay: config?.retryDelay ?? 5,
@@ -50,8 +48,6 @@ class WebCrawlerBuilder {
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
     });
-    await client.initialize();
-    return client;
   }
 
   public static createLinkDiscovery(config: CrawlerConfig): LinkDiscovery {

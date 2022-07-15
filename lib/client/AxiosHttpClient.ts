@@ -100,6 +100,10 @@ class AxiosHttpClient implements HttpClient {
   initialize(): Promise<void> {
     return Promise.resolve(undefined);
   }
+
+  destroy(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 }
 
 export default AxiosHttpClient;

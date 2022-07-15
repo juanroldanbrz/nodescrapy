@@ -1,5 +1,3 @@
-import MockAdapter from 'axios-mock-adapter';
-import { AxiosHttpClient, HttpRequest } from '..';
 import PuppeteerHttpClient from '../lib/client/PuppeteerHttpClient';
 
 const defaultHttpConfig = {
@@ -8,7 +6,7 @@ const defaultHttpConfig = {
   retryDelay: 0.2,
   delayBetweenRequests: 1,
   timeoutSeconds: 100,
-  concurrentRequests: 1,
+  concurrentRequests: 5,
   beforeRequest: undefined,
 };
 
@@ -17,7 +15,7 @@ describe('HttpClient', () => {
   it('Client should be initialized.', async () => {
     const client = await new PuppeteerHttpClient(defaultHttpConfig);
     await client.initialize();
-    expect(client.browser).toBeDefined();
+    expect(client.cluster).toBeDefined();
   });
 
   it('Client should request a page.', async () => {

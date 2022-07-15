@@ -1,10 +1,16 @@
 import puppeteer, { Browser } from 'puppeteer';
 import * as cheerio from 'cheerio';
+import { Cluster } from 'puppeteer-cluster';
 import { HtmlResponse, HtmlResponseWrapper } from '../model/HtmlResponse';
 import HttpRequest from '../model/HttpRequest';
 import HttpClient from './HttpClient';
 import logger from '../log/Logger';
 import { HttpClientConfig } from '../model/CrawlerConfig';
+
+interface DataToCrawl {
+  url: string;
+  promiseResolve: Promise<HtmlResponseWrapper>
+}
 
 async function autoScroll(page: puppeteer.Page): Promise<void> {
   await page.evaluate(async () => {
@@ -26,14 +32,17 @@ async function autoScroll(page: puppeteer.Page): Promise<void> {
 }
 
 class PuppeteerHttpClient implements HttpClient {
-  readonly delayBetweenRequests: number;
+  readonly config: HttpClientConfig;
 
-  browser: Browser;
-
-  currentPage: puppeteer.Page;
+  cluster: Cluster;
 
   constructor(config: HttpClientConfig) {
-    this.delayBetweenRequests = config.delayBetweenRequests;
+    this.config = config;
+  }
+
+  async destroy(): Promise<void> {
+    await this.cluster.idle();
+    await this.cluster.close();
   }
 
   beforeRequest(httpRequest: HttpRequest): HttpRequest {
@@ -41,35 +50,51 @@ class PuppeteerHttpClient implements HttpClient {
   }
 
   async get(urls: string[]): Promise<HtmlResponseWrapper[]> {
-    const toReturn: HtmlResponseWrapper[] = [];
-    for (const url of urls) {
-      toReturn.push(await this.onGetRequest(url, 0));
+    const promises: Promise<HtmlResponseWrapper>[] = [];
+    for (let i = 0; i < urls.length; i += 1) {
+      promises.push(this.onGetRequest(urls[i], 0));
     }
-    return toReturn;
+
+    return Promise.all(promises);
   }
 
   async onGetRequest(requestUrl: string, requestPoolId: number): Promise<HtmlResponseWrapper> {
-    logger.info(`Crawling ${requestUrl}`);
-    const httpResponse = await this.currentPage.goto(requestUrl, { waitUntil: 'networkidle2' });
-    await autoScroll(this.currentPage);
-    await this.currentPage.waitForTimeout(this.delayBetweenRequests * 1000);
-    const content = await this.currentPage.content();
-    const cheerioResponse = cheerio.load(content);
-    const innerResponse: HtmlResponse = { url: requestUrl, originalResponse: httpResponse, $: cheerioResponse };
-    return { url: requestUrl, response: innerResponse, isSuccess: true };
+    try {
+      return await this.cluster.execute(requestUrl, async ({ page, data }) => {
+        const innerRequestUrl = data;
+        logger.info(`Crawling ${innerRequestUrl}`);
+        const httpResponse = await page.goto(innerRequestUrl, { waitUntil: 'networkidle2' });
+        await autoScroll(page);
+        await page.waitForTimeout(this.config.delayBetweenRequests * 1000);
+        const content = await page.content();
+        const cheerioResponse = cheerio.load(content);
+        const innerResponse = { url: innerRequestUrl, originalResponse: httpResponse, $: cheerioResponse };
+        return { url: innerRequestUrl, response: innerResponse, isSuccess: true };
+      });
+    } catch (e) {
+      logger.error(`Failed to crawl: ${requestUrl} - ${e}`);
+      return { url: requestUrl, response: undefined, isSuccess: false };
+    }
   }
 
   async initialize(): Promise<void> {
-    logger.info('Initializing puppeteer');
-    this.browser = await puppeteer.launch({
-      headless: false,
-      args: ['--disable-setuid-sandbox'],
-      ignoreHTTPSErrors: true,
+    this.cluster = await Cluster.launch({
+      puppeteerOptions: {
+        headless: true,
+      },
+      concurrency: Cluster.CONCURRENCY_PAGE,
+      maxConcurrency: this.config.concurrentRequests,
+      retryLimit: this.config.retries,
+      retryDelay: this.config.retryDelay * 1000,
+      timeout: this.config.timeoutSeconds * 1000,
     });
-    this.currentPage = await this.browser.newPage();
-    await this.currentPage.setViewport({
-      width: 1200,
-      height: 800,
+
+    this.cluster.on('taskerror', (err, data, willRetry) => {
+      if (willRetry) {
+        logger.warn(`Encountered an error while crawling ${data.url}. ${err.message}\nThis job will be retried`);
+      } else {
+        logger.error(`Failed to crawl ${data.url}: ${err.message}`);
+      }
     });
 
     return Promise.resolve(undefined);

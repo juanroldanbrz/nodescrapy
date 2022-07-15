@@ -9,6 +9,8 @@ interface HttpClient {
   beforeRequest(httpRequest: HttpRequest): HttpRequest;
 
   onGetRequest(requestUrl: string, requestPoolId: number): Promise<HtmlResponseWrapper>;
+
+  destroy(): Promise<void>;
 }
 
 export default HttpClient;

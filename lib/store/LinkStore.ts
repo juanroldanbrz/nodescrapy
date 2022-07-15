@@ -4,6 +4,8 @@ import {
 import { Link, LinkStatus } from '../model/Link';
 
 interface LinkStore {
+    initialize(): Promise<void>;
+
     countByProviderAndStatus(provider: string, status: LinkStatus): Promise<number>;
 
     deleteAll(provider: string): Promise<number>;
@@ -32,10 +34,6 @@ class DbLinkStore implements LinkStore {
       underscored: true,
       tableName: 'LINKS',
     });
-  }
-
-  async sync(): Promise<Model> {
-    return this.linksTable.sync();
   }
 
   async addIfNew(link: Link): Promise<Link> {
@@ -112,6 +110,11 @@ class DbLinkStore implements LinkStore {
         status,
       },
     });
+  }
+
+  async initialize(): Promise<void> {
+    await this.linksTable.sync();
+    return undefined;
   }
 }
 

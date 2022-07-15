@@ -47,6 +47,7 @@
     "cheerio": "^1.0.0-rc.12",
     "promise-throttle": "^1.1.2",
     "puppeteer": "^15.4.0",
+    "puppeteer-cluster": "^0.23.0",
     "sequelize": "^6.21.2",
     "sqlite3": "^5.0.8",
     "uuid": "^8.3.2",
