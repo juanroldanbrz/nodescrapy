@@ -41,6 +41,10 @@ class MockCluster {
       evaluate: async () => {
         mockStatus.scrolled = true;
       },
+      setUserAgent: async (str) => {
+        mockStatus.userAgent = str;
+        return undefined;
+      },
       content: async () => HTML,
     };
     return taskFunction({ page, data: requestUrl });

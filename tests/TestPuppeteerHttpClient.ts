@@ -41,6 +41,7 @@ describe('HttpClient', () => {
     expect(mockClusterStatus.visitedPage).toBe('https://www.amazon.es');
     expect(mockClusterStatus.waitedTime).toBe(2000);
     expect(mockClusterStatus.scrolled).toBe(true);
+    expect(mockClusterStatus.userAgent).toBe('Firefox');
 
     const clusterConfig = mockClusterStatus.config;
 

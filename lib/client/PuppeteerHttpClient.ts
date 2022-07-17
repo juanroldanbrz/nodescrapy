@@ -58,6 +58,7 @@ class PuppeteerHttpClient implements HttpClient {
       return await this.cluster.execute(requestUrl, async ({ page, data }) => {
         const innerRequestUrl = data;
         logger.info(`Crawling ${innerRequestUrl}`);
+        await page.setUserAgent(this.config.userAgent);
         const httpResponse = await page.goto(innerRequestUrl, { waitUntil: 'networkidle2' });
         if (this.config.autoScrollToBottom) {
           await autoScroll(page);

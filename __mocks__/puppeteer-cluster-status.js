@@ -13,6 +13,8 @@ class PuppeteerClusterStatus {
 
   closed = false;
 
+  userAgent;
+
   reset = () => {
     this.config = undefined;
     this.closed = false;
@@ -21,6 +23,7 @@ class PuppeteerClusterStatus {
     this.visitedPage = undefined;
     this.scrolled = false;
     this.waitedTime = 0;
+    this.userAgent = undefined;
   };
 }
 
