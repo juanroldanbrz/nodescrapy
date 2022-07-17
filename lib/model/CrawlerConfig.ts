@@ -3,13 +3,20 @@ import { DataStore } from '../store/DataStore';
 import { LinkStore } from '../store/LinkStore';
 import { HtmlResponse } from './HtmlResponse';
 
+enum CrawlerClientLibrary {
+    AXIOS = 'AXIOS',
+    PUPPETEER = 'PUPPETEER'
+}
+
 interface HttpClientConfig {
+    library?: CrawlerClientLibrary,
     retries?: number,
     userAgent?: string,
     retryDelay?: number,
     delayBetweenRequests?: number,
     timeoutSeconds?: number,
     concurrentRequests? : number,
+    autoScrollToBottom? : boolean,
     beforeRequest?: (htmlRequest: HttpRequest) => HttpRequest;
 }
 
@@ -46,4 +53,5 @@ export {
   HttpClientConfig,
   CrawlerConfig,
   CrawlContinuationMode,
+  CrawlerClientLibrary,
 };

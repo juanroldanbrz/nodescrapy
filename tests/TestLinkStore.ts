@@ -11,7 +11,7 @@ describe('DbLinkStore', () => {
 
   it('Should persist a new link', async () => {
     const dbLinkStore = new DbLinkStore(sequelize);
-    await dbLinkStore.sync();
+    await dbLinkStore.initialize();
     const link = await dbLinkStore.addIfNew({
       provider: 'REDDIT',
       url: `http://test${uuid4()}`,

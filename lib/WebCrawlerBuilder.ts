@@ -1,10 +1,13 @@
 import * as url from 'url';
 import { Sequelize } from 'sequelize';
-import { CrawlerConfig, HttpClientConfig } from './model/CrawlerConfig';
+import { CrawlerClientLibrary, CrawlerConfig, HttpClientConfig } from './model/CrawlerConfig';
 import { DbLinkStore, LinkStore } from './store/LinkStore';
 import LinkDiscovery from './discovery/LinkDiscovery';
 import { DataStore, FileDataStore } from './store/DataStore';
 import HttpClient from './client/HttpClient';
+import AxiosHttpClient from './client/AxiosHttpClient';
+import PuppeteerHttpClient from './client/PuppeteerHttpClient';
+import logger from './log/Logger';
 
 const appRoot = require('app-root-path');
 
@@ -12,7 +15,7 @@ const defaultUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
     + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36';
 
 class WebCrawlerBuilder {
-  public static async createLinkStore(config: CrawlerConfig): Promise<LinkStore> {
+  public static createLinkStore(config: CrawlerConfig): LinkStore {
     if (config?.implementation?.linkStore !== undefined) {
       return config.implementation.linkStore;
     }
@@ -21,9 +24,7 @@ class WebCrawlerBuilder {
     const sequelize = new Sequelize(`sqlite:////${sqliteDbPath}`, {
       logging: false,
     });
-    const dbLinkStore = new DbLinkStore(sequelize);
-    await dbLinkStore.sync();
-    return dbLinkStore;
+    return new DbLinkStore(sequelize);
   }
 
   public static createDataStore(config: CrawlerConfig): DataStore {
@@ -39,7 +40,7 @@ class WebCrawlerBuilder {
   }
 
   public static createHttpClient(config: HttpClientConfig): HttpClient {
-    return new HttpClient({
+    const parsedConfig: HttpClientConfig = {
       retries: config?.retries ?? 2,
       userAgent: config?.userAgent ?? defaultUserAgent,
       retryDelay: config?.retryDelay ?? 5,
@@ -47,7 +48,16 @@ class WebCrawlerBuilder {
       timeoutSeconds: config?.timeoutSeconds ?? 10,
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
-    });
+      autoScrollToBottom: config?.autoScrollToBottom ?? true,
+      library: config.library ?? CrawlerClientLibrary.AXIOS,
+    };
+    if (parsedConfig.library === CrawlerClientLibrary.AXIOS) {
+      logger.info('Client configured with AXIOS library');
+      return new AxiosHttpClient(parsedConfig);
+    }
+
+    logger.info('Client configured with Puppeteer library');
+    return new PuppeteerHttpClient(parsedConfig);
   }
 
   public static createLinkDiscovery(config: CrawlerConfig): LinkDiscovery {

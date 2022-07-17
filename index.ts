@@ -1,5 +1,8 @@
+import AxiosHttpClient from './lib/client/AxiosHttpClient';
 import HttpRequest from './lib/model/HttpRequest';
-import { CrawlContinuationMode, CrawlerConfig, LinkDiscoveryConfig } from './lib/model/CrawlerConfig';
+import {
+  CrawlContinuationMode, CrawlerClientLibrary, CrawlerConfig, LinkDiscoveryConfig,
+} from './lib/model/CrawlerConfig';
 import { HtmlResponse } from './lib/model/HtmlResponse';
 import { Link, LinkStatus } from './lib/model/Link';
 import DataEntry from './lib/model/DataEntry';
@@ -11,6 +14,7 @@ import WebCrawler from './lib/WebCrawler';
 import HttpClient from './lib/client/HttpClient';
 
 export {
+  AxiosHttpClient,
   HttpClient,
   LinkStatus,
   WebCrawler,
@@ -27,4 +31,5 @@ export {
   DbLinkStore,
   LinkDiscoveryConfig,
   CrawlContinuationMode,
+  CrawlerClientLibrary,
 };

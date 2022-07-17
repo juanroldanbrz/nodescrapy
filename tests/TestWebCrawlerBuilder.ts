@@ -1,11 +1,21 @@
 import appRoot from 'app-root-path';
 import {
-  DataStore, WebCrawlerBuilder, HttpRequest, DataEntry, FileDataStore, DbLinkStore, LinkStore, Link, LinkStatus,
+  DataStore,
+  WebCrawlerBuilder,
+  HttpRequest,
+  DataEntry,
+  FileDataStore,
+  DbLinkStore,
+  LinkStore,
+  Link,
+  LinkStatus,
+  AxiosHttpClient, CrawlerClientLibrary,
 } from '../index';
+import PuppeteerHttpClient from '../lib/client/PuppeteerHttpClient';
 
 describe('WebCrawlerBuilder', () => {
-  it('Should create the http client with default configuration', async () => {
-    const client = WebCrawlerBuilder.createHttpClient({});
+  it('Should create the http client with axios configuration', async () => {
+    const client = WebCrawlerBuilder.createHttpClient({}) as AxiosHttpClient;
     expect(client.originalConfig.concurrentRequests).toBe(1);
     expect(client.originalConfig.userAgent).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
             + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36');
@@ -14,6 +24,15 @@ describe('WebCrawlerBuilder', () => {
     expect(client.originalConfig.concurrentRequests).toBe(1);
     expect(client.originalConfig.retryDelay).toBe(5);
     expect(client.originalConfig.beforeRequest).toBeUndefined();
+  });
+
+  it('Should create the http client with puppeteer configuration', async () => {
+    const config = {
+      library: CrawlerClientLibrary.PUPPETEER,
+    };
+
+    const client = WebCrawlerBuilder.createHttpClient(config) as PuppeteerHttpClient;
+    expect(client).toBeDefined();
   });
 
   it('Should create the http client overriding default configuration', async () => {
@@ -27,7 +46,7 @@ describe('WebCrawlerBuilder', () => {
       beforeRequest: (httpRequest: HttpRequest) => httpRequest,
     };
 
-    const client = WebCrawlerBuilder.createHttpClient(config);
+    const client = WebCrawlerBuilder.createHttpClient(config) as AxiosHttpClient;
     expect(client.originalConfig.concurrentRequests).toBe(5);
     expect(client.originalConfig.userAgent).toBe('Firefox');
     expect(client.originalConfig.delayBetweenRequests).toBe(5);
@@ -132,6 +151,7 @@ describe('WebCrawlerBuilder', () => {
       entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
       onItemCrawled: (response) => undefined,
     }) as DbLinkStore;
+    await linkStore.initialize();
 
     expect(linkStore.linksTable.sequelize.config.database).toContain('nodescrapy/cache.sqlite');
     expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
@@ -144,6 +164,7 @@ describe('WebCrawlerBuilder', () => {
       sqlitePath: `${appRoot}/tests/tmp/data.sqlite`,
     }) as DbLinkStore;
 
+    await linkStore.initialize();
     expect(linkStore.linksTable.sequelize.config.database).toContain('tmp/data.sqlite');
     expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
   });
@@ -166,6 +187,10 @@ describe('WebCrawlerBuilder', () => {
       }
 
       findByProviderAndStatus(provider: string, status: LinkStatus, n: number): Promise<Array<Link>> {
+        return Promise.resolve(undefined);
+      }
+
+      initialize(): Promise<void> {
         return Promise.resolve(undefined);
       }
     }

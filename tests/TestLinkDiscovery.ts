@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import {
-  HtmlResponse, HttpClient, LinkDiscovery, LinkDiscoveryConfig,
+  HtmlResponse, AxiosHttpClient, LinkDiscovery, LinkDiscoveryConfig,
 } from '../index';
 
 const HTML = `
@@ -37,7 +37,7 @@ describe('LinkDiscovery', () => {
     onLinksDiscovered: undefined,
   };
 
-  const client = new HttpClient(defaultHttpConfig);
+  const client = new AxiosHttpClient(defaultHttpConfig);
   const axiosInternalClient = client.clients[0];
   const mockClient = new MockAdapter(axiosInternalClient);
   mockClient.onGet().reply(200, HTML);

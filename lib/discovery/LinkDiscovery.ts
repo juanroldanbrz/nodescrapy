@@ -26,17 +26,20 @@ class LinkDiscovery {
     const alLinks = new Set<string>();
     linkObjects.each((index, element) => {
       let tmpUri = $(element).attr('href');
-      if (tmpUri.startsWith('/')) {
-        tmpUri = baseUrl + tmpUri;
-      }
-      const tmpUrl = url.parse(tmpUri);
 
-      if (this.allowedDomains.has(tmpUrl.hostname)) {
-        if (this.removeQueryParams) {
-          tmpUri = tmpUri.replace(`?${tmpUrl.query}`, '');
+      if (tmpUri !== undefined) {
+        if (tmpUri && tmpUri.startsWith('/')) {
+          tmpUri = baseUrl + tmpUri;
         }
-        tmpUri = tmpUri.replace(/\/$/, '');
-        alLinks.add(tmpUri);
+        const tmpUrl = url.parse(tmpUri);
+
+        if (this.allowedDomains.has(tmpUrl.hostname)) {
+          if (this.removeQueryParams) {
+            tmpUri = tmpUri.replace(`?${tmpUrl.query}`, '');
+          }
+          tmpUri = tmpUri.replace(/\/$/, '');
+          alLinks.add(tmpUri);
+        }
       }
     });
     const toReturn = this.filterRegex(alLinks);

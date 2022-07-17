@@ -13,6 +13,8 @@ Nodescrapy comes with a built-in web spider, which will discover automatically a
 
 Nodescrapy saves the status of the crawling in a local Sqlite database, so crawling can be stopped and resumed.
 
+Nodescrapy provides a default integration with AXIOS and PUPPETEER to choose if rendering javascript or not.
+
 By default, Nodescrapy saves the results of the scrapping in a local folder in JSON files.
 
 ```ts
@@ -182,7 +184,7 @@ This information should be enough to extract the information you need from that 
 interface HtmlResponse {
   url: string;
 
-  axiosResponse: AxiosResponse;
+  originalResponse: AxiosResponse;
 
   $: CheerioAPI;
 }
@@ -226,6 +228,24 @@ enum CrawlContinuationMode {
 }
 ```
 
+<a name="DataModel+CrawlerClientLibrary"></a>
+
+#### CrawlerClientLibrary
+
+Enum which defines the implementation of the client.
+Puppeteer will automatically render javascript using chrome.
+
+If puppeteer, chrome executable should be present in the system.
+
+Values:
+- AXIOS
+- PUPPETEER
+```ts
+enum CrawlerClientLibrary {
+    AXIOS = 'AXIOS',
+    PUPPETEER = 'PUPPETEER'
+}
+```
 <a name="CrawlerConfiguration"></a>
 ## Crawler configuration
 ### Full typescript configuration definition
@@ -237,13 +257,15 @@ This is a definition of all the possible configuration supported currently by th
     mode: 'START_FROM_SCRATCH',
     entryUrls: ['http://www.pararius.com'],
     client: {
+        library: 'PUPPETEER',
+        autoScrollToBottom: true,
         concurrentRequests: 5,
         retries: 5,
         userAgent: 'Firefox',
         retryDelay: 2,
         delayBetweenRequests: 2,
         timeoutSeconds: 100,
-        beforeRequest: (htmlRequest: HttpRequest) => {
+        beforeRequest: (htmlRequest: HttpRequest) => { // Only for AXIOS client.
             htmlRequest.headers.Authorization = 'JWT MyAuth';
             return htmlRequest;
         }
@@ -369,6 +391,13 @@ Configures where to store the sqlite database (full path, including name)
 <a name="CrawlerClientConfig"></a>
 ### Client configuration
 
+<a name="CrawlerClientConfig+library"></a>
+#### client.library :  <code>string</code>
+
+Chooses the client [implementation](#DataModel+CrawlerClientLibrary) between AXIOS or PUPPETEER.
+**Default**: `AXIOS`
+<br></br>
+
 <a name="CrawlerClientConfig+concurrentRequests"></a>
 #### client.concurrentRequests :  <code>number</code>
 
@@ -390,6 +419,13 @@ Configures the number of retries to perform when a request is failed.
 Configures the user agents of the client.
 
 **Default**: `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36`
+<br></br>
+
+#### client.autoScrollToBottom :  <code>boolean</code>
+
+If true and client is puppeteer, every page will be scrolled to the bottom before rendered.
+
+**Default**: `true`
 <br></br>
 
 <a name="CrawlerClientConfig+retryDelay"></a>
