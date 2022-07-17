@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "noEmitHelpers": false,
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "ES2017",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": "./lib"
   },
-  "lib": ["es2015"]
+  "exclude": ["tests"],
+  "lib": ["ES2017"]
 }
 
