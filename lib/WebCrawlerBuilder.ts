@@ -1,6 +1,6 @@
 import * as url from 'url';
 import { Sequelize } from 'sequelize';
-import { CrawlerConfig, HttpClientConfig } from './model/CrawlerConfig';
+import { CrawlerClientLibrary, CrawlerConfig, HttpClientConfig } from './model/CrawlerConfig';
 import { DbLinkStore, LinkStore } from './store/LinkStore';
 import LinkDiscovery from './discovery/LinkDiscovery';
 import { DataStore, FileDataStore } from './store/DataStore';
@@ -39,7 +39,7 @@ class WebCrawlerBuilder {
   }
 
   public static createHttpClient(config: HttpClientConfig): HttpClient {
-    return new PuppeteerHttpClient({
+    const parsedConfig: HttpClientConfig = {
       retries: config?.retries ?? 2,
       userAgent: config?.userAgent ?? defaultUserAgent,
       retryDelay: config?.retryDelay ?? 5,
@@ -47,7 +47,12 @@ class WebCrawlerBuilder {
       timeoutSeconds: config?.timeoutSeconds ?? 10,
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
-    });
+      library: config.library ?? CrawlerClientLibrary.AXIOS,
+    };
+    if (parsedConfig.library === CrawlerClientLibrary.AXIOS) {
+      return new AxiosHttpClient(parsedConfig);
+    }
+    return new PuppeteerHttpClient(parsedConfig);
   }
 
   public static createLinkDiscovery(config: CrawlerConfig): LinkDiscovery {
