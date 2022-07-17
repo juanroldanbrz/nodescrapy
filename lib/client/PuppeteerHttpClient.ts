@@ -1,7 +1,7 @@
-import puppeteer, { Browser } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
 import { Cluster } from 'puppeteer-cluster';
-import { HtmlResponse, HtmlResponseWrapper } from '../model/HtmlResponse';
+import { HtmlResponseWrapper } from '../model/HtmlResponse';
 import HttpRequest from '../model/HttpRequest';
 import HttpClient from './HttpClient';
 import logger from '../log/Logger';
@@ -64,7 +64,9 @@ class PuppeteerHttpClient implements HttpClient {
         const innerRequestUrl = data;
         logger.info(`Crawling ${innerRequestUrl}`);
         const httpResponse = await page.goto(innerRequestUrl, { waitUntil: 'networkidle2' });
-        await autoScroll(page);
+        if (this.config.autoScrollToBottom) {
+          await autoScroll(page);
+        }
         await page.waitForTimeout(this.config.delayBetweenRequests * 1000);
         const content = await page.content();
         const cheerioResponse = cheerio.load(content);

@@ -7,6 +7,7 @@ import { DataStore, FileDataStore } from './store/DataStore';
 import HttpClient from './client/HttpClient';
 import AxiosHttpClient from './client/AxiosHttpClient';
 import PuppeteerHttpClient from './client/PuppeteerHttpClient';
+import logger from './log/Logger';
 
 const appRoot = require('app-root-path');
 
@@ -47,11 +48,15 @@ class WebCrawlerBuilder {
       timeoutSeconds: config?.timeoutSeconds ?? 10,
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
+      autoScrollToBottom: config?.autoScrollToBottom ?? true,
       library: config.library ?? CrawlerClientLibrary.AXIOS,
     };
     if (parsedConfig.library === CrawlerClientLibrary.AXIOS) {
+      logger.info('Client configured with AXIOS library');
       return new AxiosHttpClient(parsedConfig);
     }
+
+    logger.info('Client configured with Puppeteer library');
     return new PuppeteerHttpClient(parsedConfig);
   }
 

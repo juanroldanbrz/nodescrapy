@@ -16,6 +16,7 @@ interface HttpClientConfig {
     delayBetweenRequests?: number,
     timeoutSeconds?: number,
     concurrentRequests? : number,
+    autoScrollToBottom? : boolean,
     beforeRequest?: (htmlRequest: HttpRequest) => HttpRequest;
 }
 
