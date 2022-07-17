@@ -8,7 +8,6 @@
     "outDir": "dist",
     "baseUrl": "./lib"
   },
-  "exclude": ["tests"],
   "lib": ["es2015"]
 }
 

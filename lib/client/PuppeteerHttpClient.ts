@@ -7,11 +7,6 @@ import HttpClient from './HttpClient';
 import logger from '../log/Logger';
 import { HttpClientConfig } from '../model/CrawlerConfig';
 
-interface DataToCrawl {
-  url: string;
-  promiseResolve: Promise<HtmlResponseWrapper>
-}
-
 async function autoScroll(page: puppeteer.Page): Promise<void> {
   await page.evaluate(async () => {
     await new Promise((resolve, reject) => {

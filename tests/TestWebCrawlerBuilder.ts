@@ -177,6 +177,10 @@ describe('WebCrawlerBuilder', () => {
       findByProviderAndStatus(provider: string, status: LinkStatus, n: number): Promise<Array<Link>> {
         return Promise.resolve(undefined);
       }
+
+      initialize(): Promise<void> {
+        return Promise.resolve(undefined);
+      }
     }
 
     const linkStoreImpl = new LinkStoreImpl();
