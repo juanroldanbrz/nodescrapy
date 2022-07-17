@@ -164,6 +164,7 @@ describe('WebCrawlerBuilder', () => {
       sqlitePath: `${appRoot}/tests/tmp/data.sqlite`,
     }) as DbLinkStore;
 
+    await linkStore.initialize();
     expect(linkStore.linksTable.sequelize.config.database).toContain('tmp/data.sqlite');
     expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
   });
