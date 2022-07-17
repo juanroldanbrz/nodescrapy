@@ -9,11 +9,12 @@ import {
   LinkStore,
   Link,
   LinkStatus,
-  AxiosHttpClient,
+  AxiosHttpClient, CrawlerClientLibrary,
 } from '../index';
+import PuppeteerHttpClient from '../lib/client/PuppeteerHttpClient';
 
 describe('WebCrawlerBuilder', () => {
-  it('Should create the http client with default configuration', async () => {
+  it('Should create the http client with axios configuration', async () => {
     const client = WebCrawlerBuilder.createHttpClient({}) as AxiosHttpClient;
     expect(client.originalConfig.concurrentRequests).toBe(1);
     expect(client.originalConfig.userAgent).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
@@ -23,6 +24,15 @@ describe('WebCrawlerBuilder', () => {
     expect(client.originalConfig.concurrentRequests).toBe(1);
     expect(client.originalConfig.retryDelay).toBe(5);
     expect(client.originalConfig.beforeRequest).toBeUndefined();
+  });
+
+  it('Should create the http client with puppeteer configuration', async () => {
+    const config = {
+      library: CrawlerClientLibrary.PUPPETEER,
+    };
+
+    const client = WebCrawlerBuilder.createHttpClient(config) as PuppeteerHttpClient;
+    expect(client).toBeDefined();
   });
 
   it('Should create the http client overriding default configuration', async () => {
