@@ -151,6 +151,7 @@ describe('WebCrawlerBuilder', () => {
       entryUrls: ['http://www.mydomain.com', 'http://myotherdomain.com'],
       onItemCrawled: (response) => undefined,
     }) as DbLinkStore;
+    await linkStore.initialize();
 
     expect(linkStore.linksTable.sequelize.config.database).toContain('nodescrapy/cache.sqlite');
     expect(await linkStore.linksTable.count()).toBeGreaterThanOrEqual(0);
