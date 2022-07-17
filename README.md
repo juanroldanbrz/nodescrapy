@@ -228,7 +228,7 @@ enum CrawlContinuationMode {
 }
 ```
 
-<a name="DataModel#CrawlerClientLibrary"></a>
+<a name="DataModel+CrawlerClientLibrary"></a>
 
 #### CrawlerClientLibrary
 
@@ -394,7 +394,7 @@ Configures where to store the sqlite database (full path, including name)
 <a name="CrawlerClientConfig+library"></a>
 #### client.library :  <code>string</code>
 
-Chooses the client [implementation](DataModel#CrawlerClientLibrary) between AXIOS or PUPPETEER.
+Chooses the client [implementation](#DataModel+CrawlerClientLibrary) between AXIOS or PUPPETEER.
 **Default**: `AXIOS`
 <br></br>
 
