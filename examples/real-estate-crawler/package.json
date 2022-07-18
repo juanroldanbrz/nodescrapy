@@ -4,15 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
-    "lint": "eslint . --ext .ts"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "typescript": "^4.7.4"
-  },
   "dependencies": {
-    "@bluggie/nodescrapy": "^0.1.2"
+    "@bluggie/nodescrapy": "^0.1.5"
   }
 }
