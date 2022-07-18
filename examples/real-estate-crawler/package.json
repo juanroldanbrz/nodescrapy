@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@bluggie/nodescrapy": "^0.1.5"
+    "@bluggie/nodescrapy": "^0.1.6"
   }
 }
