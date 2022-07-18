@@ -14,6 +14,7 @@ const crawler = new WebCrawler({
   name: 'parariusCrawler',
   entryUrls: ['https://www.pararius.com/apartments/amsterdam/page-1'],
   dataPath: './',
+  dataBatchSize: 10,
   discovery: {
     allowedPath: ['apartment-for-rent/amsterdam/', '/apartments/amsterdam/page-[1-9]+'],
   },
