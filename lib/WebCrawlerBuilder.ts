@@ -49,7 +49,7 @@ class WebCrawlerBuilder {
       concurrentRequests: config?.concurrentRequests ?? 1,
       beforeRequest: config?.beforeRequest,
       autoScrollToBottom: config?.autoScrollToBottom ?? true,
-      library: config.library ?? CrawlerClientLibrary.AXIOS,
+      library: config?.library ?? CrawlerClientLibrary.AXIOS,
     };
     if (parsedConfig.library === CrawlerClientLibrary.AXIOS) {
       logger.info('Client configured with AXIOS library');
